@@ -1,39 +1,27 @@
 # Raygun4js
 
-Raygun.io plugin for JavaScript
+Raygun.io plugin for JavaScript, *modified to send diagnostics data to the JG diagnostics service*
+
+##JustGiving changes
+
+### Changes made
+- Removed Raygun API key
+- Modified Raygun.init() to take the url of the diagnostics service instead of the API key
+- Changed the format of the data sent in the AJAX POST request
+
+### Changes to make
+- Clean up documentation (e.g. getting started)
+- Rename instances of Raygun to JG/GG?
+- Get bower running as part of the GG build script (currently this is run manually)
+- exclude automatically built /dist files from source control once bower is running automatically
+
 
 ## Getting Started
 
-### With Bower
-
-Run `bower install raygun4js`
-
-### CDN
-
-Raygun4JS is now available from our content delivery network:
-
-```html
-<script type="text/javascript" src="//cdn.raygun.io/raygun4js/raygun.min.js"></script>
-```
-
-It is available over both HTTP and HTTPS.
-
-You can reference any of the scripts below. The scripts in the /raygun4js/ directory will always be the latest release, and specific releases are available undern /raygun4js/1.x.x/.
-
 ### From NuGet
 
-Visual Studio users can get it by opening the Package Manager Console and typing `Install-Package raygun4js`
+Visual Studio users can get it by opening the Package Manager Console and typing `Install-Package gg-raygun4js`
 
-### Manual download
-
-Download the [production version][min] or the [development version][max]. You can also download a version without
-the jQuery hooks if you are not using jQuery or you wish to provide your own hooks. Get this as a
-[production version][min.vanilla] or [development version][max.vanilla].
-
-[min]: https://raw.github.com/MindscapeHQ/raygun4js/master/dist/raygun.min.js
-[max]: https://raw.github.com/MindscapeHQ/raygun4js/master/dist/raygun.js
-[min.vanilla]: https://raw.github.com/MindscapeHQ/raygun4js/master/dist/raygun.vanilla.min.js
-[max.vanilla]: https://raw.github.com/MindscapeHQ/raygun4js/master/dist/raygun.vanilla.js
 
 ## Usage
 
@@ -104,7 +92,7 @@ Pass in an object as the second parameter to init() containing one or more of th
 
 `ignore3rdPartyErrors` - ignores any errors that have no stack trace information. This will discard any errors that occur completely
 within 3rd party scripts - if code loaded from the current domain called the 3rd party function, it will have at least one stack line
-and will still be sent.
+and will still be sent. Defaults to true.
 
 `excludedHostnames` - Prevents errors from being sent from certain hostnames (domains) by providing an array of strings or RegExp
 objects (for partial matches). Each should match the hostname or TLD that you want to exclude. Note that protocols are not tested.
@@ -114,7 +102,7 @@ objects (for partial matches). Each should match the hostname or TLD that you wa
 An example:
 
 ```javascript
-Raygun.init('apikey', {
+Raygun.init('url', {
   allowInsecureSubmissions: true,
   ignoreAjaxAbort: true,
   ignoreAjaxError: true,
@@ -133,7 +121,7 @@ To create a new Raygun object and use it call:
 
 ```javascript
 var secondRaygun = Raygun.constructNewRaygun();
-secondRaygun.init('apikey');
+secondRaygun.init('url');
 secondRaygun.send(...)
 ```
 
@@ -197,7 +185,7 @@ function getMyData() {
  return { num: desiredNum };
 }
 
-Raygun.init('apikey').attach().withCustomData(getMyData);
+Raygun.init('url').attach().withCustomData(getMyData);
 ```
 
 `getMyData` will be called when Raygun4JS is about to send an error, which will construct the custom data. This will be merged with any custom data provided on a Raygun.send() call.
@@ -209,7 +197,7 @@ The Raygun dashboard can also display tags for errors. These are arrays of strin
 **On initialization:**
 
 ```javascript
-Raygun.init('{{your_api_key}}').attach().withTags(['tag1', 'tag2']);
+Raygun.init('{{url}}').attach().withTags(['tag1', 'tag2']);
 ```
 
 **During a Send:**
@@ -232,7 +220,7 @@ By default, Raygun4JS assigns a unique anonymous ID for the current user. This i
 Raygun.resetAnonymousUser();
 ```
 
-To disable anonymous user tracking, call `Raygun.init('apikey', { disableAnonymousUserTracking: true });`.
+To disable anonymous user tracking, call `Raygun.init('url', { disableAnonymousUserTracking: true });`.
 
 #### Rich user data
 
@@ -264,12 +252,12 @@ This will be transmitted with each message. A count of unique users will appear 
 
 **Resetting the user:** you can now pass in empty strings (or false to `isAnonymous`) to reset the current user for login/logout scenarios.
 
-### Version filtering
+### Version and name filtering
 
-You can set a version for your app by calling:
+You can set a version and name for your app by calling:
 
 ```
-Raygun.setVersion('1.0.0.0');
+Raygun.setVersion('1.0.0.0', 'GG.Web.Website');
 ```
 
 This will allow you to filter the errors in the dashboard by that version. You can also select only the latest version, to ignore errors that were triggered by ancient versions of your code. The parameter needs to be a string in the format x.x.x.x, where x is a positive integer.
@@ -313,13 +301,13 @@ The provider has a feature where if errors are caught when there is no network a
 Browsers have varying behavior for errors that occur in scripts located on domains that are not the origin. Many of these will be listed in Raygun as 'Script Error', or will contain junk stack traces. You can filter out these errors by settings this:
 
 ```javascript
-Raygun.init('apikey', { ignore3rdPartyErrors: true });
+Raygun.init('url', { ignore3rdPartyErrors: true });
 ```
 
 There is also an option to whitelist domains which you **do** want to allow transmission of errors to Raygun, which accepts the domains as an array of strings:
 
 ```javascript
-Raygun.init('apikey', { ignore3rdPartyErrors: true }).whitelistCrossOriginDomains(["jquery.com"]);
+Raygun.init('url', { ignore3rdPartyErrors: true }).whitelistCrossOriginDomains(["jquery.com"]);
 ```
 
 This can be used to allow errors from remote sites and CDNs.
