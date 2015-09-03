@@ -1,4 +1,4 @@
-/*! Raygun4js - v1.18.4 - 2015-06-30
+/*! Raygun4js - v1.18.4 - 2015-09-03
 * https://github.com/MindscapeHQ/raygun4js
 * Copyright (c) 2015 MindscapeHQ; Licensed MIT */
 (function(window, undefined) {
@@ -1153,13 +1153,14 @@ var raygunFactory = function (window, $, undefined) {
       _ignoreAjaxAbort = false,
       _ignoreAjaxError = false,
       _enableOfflineSave = false,
-      _ignore3rdPartyErrors = false,
+      _ignore3rdPartyErrors = true,
       _disableAnonymousUserTracking = false,
       _wrapAsynchronousCallbacks = false,
       _customData = {},
       _tags = [],
       _user,
-      _version,
+      _applicationVersion,
+      _applicationName,
       _filteredKeys,
       _whitelistedScriptDomains = [],
       _beforeSendCallback,
@@ -1188,8 +1189,8 @@ var raygunFactory = function (window, $, undefined) {
     },
 
 
-    init: function(key, options, customdata) {
-      _raygunApiKey = key;
+    init: function(url, options, customdata) {
+      _raygunApiUrl = url;
       _traceKit.remoteFetching = false;
       _customData = customdata;
 
@@ -1201,6 +1202,7 @@ var raygunFactory = function (window, $, undefined) {
         _disableAnonymousUserTracking = options.disableAnonymousUserTracking || false;
         _excludedHostnames = options.excludedHostnames || false;
         _excludedUserAgents = options.excludedUserAgents || false;
+        _ignore3rdPartyErrors = options.ignore3rdPartyErrors || true;
 
         if (typeof options.wrapAsynchronousCallbacks !== 'undefined') {
           _wrapAsynchronousCallbacks = options.wrapAsynchronousCallbacks;
@@ -1209,10 +1211,6 @@ var raygunFactory = function (window, $, undefined) {
         if (options.debugMode)
         {
           _debugMode = options.debugMode;
-        }
-        if (options.ignore3rdPartyErrors)
-        {
-          _ignore3rdPartyErrors = true;
         }
       }
 
@@ -1232,9 +1230,6 @@ var raygunFactory = function (window, $, undefined) {
     },
 
     attach: function () {
-      if (!isApiKeyConfigured()) {
-        return Raygun;
-      }
       _traceKit.report.subscribe(processUnhandledException);
 
       if (_wrapAsynchronousCallbacks) {
@@ -1299,8 +1294,9 @@ var raygunFactory = function (window, $, undefined) {
       _private.clearCookie('raygun4js-userid');
     },
 
-    setVersion: function (version) {
-      _version = version;
+    setVersion: function (version, name) {
+      _applicationVersion = version;
+      _applicationName = name;
       return Raygun;
     },
 
@@ -1447,16 +1443,6 @@ var raygunFactory = function (window, $, undefined) {
         responseData: jqXHR.responseText && jqXHR.responseText.slice ? jqXHR.responseText.slice(0, 10240) : undefined,
         activeTarget: event.target && event.target.activeElement ? event.target.activeElement.outerHTML : undefined
       });
-  }
-
-
-
-  function isApiKeyConfigured() {
-    if (_raygunApiKey && _raygunApiKey !== '') {
-      return true;
-    }
-    _private.log("Raygun API key has not been configured, make sure you call Raygun.init(yourApiKey)");
-    return false;
   }
 
   function merge(o1, o2) {
@@ -1735,47 +1721,39 @@ var raygunFactory = function (window, $, undefined) {
       _private.log('Raygun4JS: ' + msg);
     }
 
+
     var finalMessage = custom_message || stackTrace.message || options.status || 'Script error';
     finalMessage = finalMessage.substring(0, 512);
 
     var payload = {
-      'OccurredOn': new Date(),
-      'Details': {
-        'Error': {
-          'ClassName': stackTrace.name,
-          'Message': finalMessage,
-          'StackTrace': stack
-        },
-        'Environment': {
+      'TimeStamp': new Date(),
+      'Exception': {
+        'Type': stackTrace.name,
+        'Message': finalMessage,
+        'StackTrace': stack
+      },
+      'ClientData' : {
+        'Browser' : {
           'UtcOffset': new Date().getTimezoneOffset() / -60.0,
-          'User-Language': navigator.userLanguage,
-          'Document-Mode': document.documentMode,
-          'Browser-Width': getViewPort().width,
-          'Browser-Height': getViewPort().height,
-          'Screen-Width': screen.width,
-          'Screen-Height': screen.height,
-          'Color-Depth': screen.colorDepth,
-          'Browser': navigator.appCodeName,
-          'Browser-Name': navigator.appName,
-          'Browser-Version': navigator.appVersion,
-          'Platform': navigator.platform
-        },
-        'Client': {
-          'Name': 'raygun-js',
-          'Version': '1.18.4'
-        },
-        'UserCustomData': finalCustomData,
-        'Tags': options.tags,
-        'Request': {
-          'Url': [location.protocol, '//', location.host, location.pathname, location.hash].join(''),
-          'QueryString': qs,
-          'Headers': {
-            'User-Agent': navigator.userAgent,
-            'Referer': document.referrer,
-            'Host': document.domain
-          }
-        },
-        'Version': _version || 'Not supplied'
+          'UserLanguage': navigator.userLanguage,
+          'DocumentMode': document.documentMode,
+          'BrowserWidth': getViewPort().width,
+          'BrowserHeight': getViewPort().height,
+          'ScreenWidth': screen.width,
+          'ScreenHeight': screen.height,
+          'ColorDepth': screen.colorDepth
+        }
+      },
+      'Request': {
+        'Url': [location.protocol, '//', location.host, location.pathname, location.hash].join(''),
+        'UrlReferrer' : document.referrer,
+        'QueryString': qs
+      },
+      'Tags': options.tags,
+      'CustomData': finalCustomData,
+      'Server' : {
+        'ApplicationVersion' : _applicationVersion || 'Not supplied',
+        'ApplicationName' : _applicationName || 'Not supplied'
       }
     };
 
@@ -1798,12 +1776,8 @@ var raygunFactory = function (window, $, undefined) {
   }
 
   function sendToRaygun(data) {
-    if (!isApiKeyConfigured()) {
-      return;
-    }
-
     _private.log('Sending exception data to Raygun:', data);
-    var url = _raygunApiUrl + '/entries?apikey=' + encodeURIComponent(_raygunApiKey);
+    var url = _raygunApiUrl;
     makePostCorsRequest(url, JSON.stringify(data));
   }
 
