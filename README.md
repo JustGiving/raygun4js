@@ -8,6 +8,7 @@ Raygun.io plugin for JavaScript, *modified to send diagnostics data to the JG di
 - Removed Raygun API key
 - Modified Raygun.init() to take the url of the diagnostics service instead of the API key
 - Changed the format of the data sent in the AJAX POST request
+- Added "gg-" prefix to all /dist files, so that it won't clash with existing raygun installations
 
 ### Changes to make
 - Clean up documentation (e.g. getting started)

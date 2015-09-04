@@ -22,8 +22,8 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'dist/raygun.js': ['tracekit/tracekit.js', 'src/raygun.tracekit.jquery.js', 'src/raygun.js', 'src/raygun.js-url.js'],
-          'dist/raygun.vanilla.js': ['tracekit/tracekit.js', 'src/raygun.js', 'src/raygun.js-url.js']
+          'dist/gg-raygun.js': ['tracekit/tracekit.js', 'src/raygun.tracekit.jquery.js', 'src/raygun.js', 'src/raygun.js-url.js'],
+          'dist/gg-raygun.vanilla.js': ['tracekit/tracekit.js', 'src/raygun.js', 'src/raygun.js-url.js']
         }
       },
     },
@@ -34,8 +34,8 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'dist/raygun.min.js': ['dist/raygun.js'],
-          'dist/raygun.vanilla.min.js': ['dist/raygun.vanilla.js']
+          'dist/gg-raygun.min.js': ['dist/gg-raygun.js'],
+          'dist/gg-raygun.vanilla.min.js': ['dist/gg-raygun.vanilla.js']
         }
       },
     },
