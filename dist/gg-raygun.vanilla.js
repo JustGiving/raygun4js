@@ -1,4 +1,4 @@
-/*! Raygun4js - v1.18.4 - 2015-09-04
+/*! Raygun4js - v1.18.4 - 2015-09-15
 * https://github.com/MindscapeHQ/raygun4js
 * Copyright (c) 2015 MindscapeHQ; Licensed MIT */
 (function(window, undefined) {
@@ -1146,8 +1146,7 @@ var raygunFactory = function (window, $, undefined) {
 
   // pull local copy of TraceKit to handle stack trace collection
   var _traceKit = TraceKit,
-      _raygun = window.Raygun,
-      _raygunApiKey,
+      _raygun = !!window.GG ? window.GG.Raygun : undefined,
       _debugMode = false,
       _allowInsecureSubmissions = false,
       _ignoreAjaxAbort = false,
@@ -1164,7 +1163,7 @@ var raygunFactory = function (window, $, undefined) {
       _filteredKeys,
       _whitelistedScriptDomains = [],
       _beforeSendCallback,
-      _raygunApiUrl = 'https://api.raygun.io',
+      _raygunApiUrl = '',
       _excludedHostnames = null,
       _excludedUserAgents = null,
       _filterScope = 'customData',
@@ -1177,7 +1176,7 @@ var raygunFactory = function (window, $, undefined) {
   var Raygun =
   {
     noConflict: function () {
-      window.Raygun = _raygun;
+      window.GG.Raygun = _raygun;
       return Raygun;
     },
 
@@ -1594,7 +1593,7 @@ var raygunFactory = function (window, $, undefined) {
   }
 
   function processUnhandledException(stackTrace, options) {
-    var stack = [],
+    var stack = "",
         qs = {};
 
     if (_ignore3rdPartyErrors) {
@@ -1659,13 +1658,12 @@ var raygunFactory = function (window, $, undefined) {
 
     if (stackTrace.stack && stackTrace.stack.length) {
       forEach(stackTrace.stack, function (i, frame) {
-        stack.push({
-          'LineNumber': frame.line,
-          'ColumnNumber': frame.column,
-          'ClassName': 'line ' + frame.line + ', column ' + frame.column,
-          'FileName': frame.url,
-          'MethodName': frame.func || '[anonymous]'
-        });
+        var funcName = !frame.func || frame.func === "at " ? "[anonymous]" : frame.func;
+        stack += funcName + " @ "
+              + "(" + (frame.url || '[anonymous]')
+              + ":" + frame.line.toString()
+              + ":" + frame.column.toString()
+              + ")\n";
       });
     }
 
@@ -1744,6 +1742,7 @@ var raygunFactory = function (window, $, undefined) {
           'ColorDepth': screen.colorDepth
         }
       },
+      'Message' : null,
       'Request': {
         'Url': [location.protocol, '//', location.host, location.pathname, location.hash].join(''),
         'UrlReferrer' : document.referrer,
@@ -1756,9 +1755,6 @@ var raygunFactory = function (window, $, undefined) {
         'ApplicationName' : _applicationName || 'Not supplied'
       }
     };
-
-    ensureUser();
-    payload.Details.User = _user;
 
     if (_filterScope === 'all') {
       payload = filterObject(payload);
@@ -1777,7 +1773,7 @@ var raygunFactory = function (window, $, undefined) {
 
   function sendToRaygun(data) {
     _private.log('Sending exception data to Raygun:', data);
-    var url = _raygunApiUrl;
+    var url = _raygunApiUrl + "/errors/js/";
     makePostCorsRequest(url, JSON.stringify(data));
   }
 
@@ -1857,8 +1853,11 @@ var raygunFactory = function (window, $, undefined) {
     xhr.send(data);
   }
 
-  if (!window.Raygun) {
-    window.Raygun = Raygun;
+  if (!window.GG){
+    window.GG = {}
+  };
+  if (!window.GG.Raygun) {
+    window.GG.Raygun = Raygun;
   }
 
   return Raygun;
@@ -1950,5 +1949,5 @@ var raygunJsUrlFactory = function (window, Raygun) {
 
 };
 
-raygunJsUrlFactory(window, window.Raygun);
-window.Raygun._seal();
+raygunJsUrlFactory(window, window.GG.Raygun);
+window.GG.Raygun._seal();

@@ -5,17 +5,15 @@ Raygun.io plugin for JavaScript, *modified to send diagnostics data to the JG di
 ##JustGiving changes
 
 ### Changes made
-- Removed Raygun API key
 - Modified Raygun.init() to take the url of the diagnostics service instead of the API key
 - Changed the format of the data sent in the AJAX POST request
-- Added "gg-" prefix to all /dist files, so that it won't clash with existing raygun installations
+- Added "gg-" prefix to all /dist files and the `GG.` prefix to the `Raygun` object, so that it won't clash with existing raygun installations
+- Modified setVersion() to include application name
 
 ### Changes to make
 - Clean up documentation (e.g. getting started)
-- Rename instances of Raygun to JG/GG?
 - Get bower running as part of the GG build script (currently this is run manually)
 - exclude automatically built /dist files from source control once bower is running automatically
-
 
 ## Getting Started
 
@@ -31,20 +29,20 @@ In your web page:
 ```html
 <script src="dist/raygun.min.js"></script>
 <script>
-  Raygun.init('yourApiKey');
+  GG.Raygun.init('diagnosticsServiceUrl');
 </script>
 ```
 
 To submit manual errors:
 
 ```javascript
-Raygun.init('yourApiKey');
+GG.Raygun.init('diagnosticsServiceUrl');
 try {
   // your code
   throw new Error('oops');
 }
 catch(e) {
-  Raygun.send(e);
+  GG.Raygun.send(e);
 }
 ```
 
@@ -57,14 +55,14 @@ To automatically catch and send unhandled errors, attach the window.onerror hand
 ```html
 <script src="dist/raygun.min.js"></script>
 <script>
-  Raygun.init('yourApiKey').attach();
+  GG.Raygun.init('diagnosticsServiceUrl').attach();
 </script>
 ```
 
 If you need to detach it (this will disable automatic unhandled error sending):
 
 ```javascript
-Raygun.detach();
+GG.Raygun.detach();
 ```
 
 If you are serving your site over HTTP and want IE8 to be able to submit JavaScript errors then you will
@@ -72,7 +70,7 @@ need to set the following setting which will allow IE8 to submit the error over 
 will only submit over HTTPS which IE8 will not allow while being served over HTTP.
 
 ```javascript
-Raygun.init('yourApiKey', { allowInsecureSubmissions: true });
+GG.Raygun.init('diagnosticsServiceUrl', { allowInsecureSubmissions: true });
 ```
 
 ## Documentation
@@ -103,7 +101,7 @@ objects (for partial matches). Each should match the hostname or TLD that you wa
 An example:
 
 ```javascript
-Raygun.init('url', {
+GG.Raygun.init('url', {
   allowInsecureSubmissions: true,
   ignoreAjaxAbort: true,
   ignoreAjaxError: true,
@@ -121,7 +119,7 @@ You can now have multiple Raygun objects in global scope. This lets you set them
 To create a new Raygun object and use it call:
 
 ```javascript
-var secondRaygun = Raygun.constructNewRaygun();
+var secondRaygun = GG.Raygun.constructNewRaygun();
 secondRaygun.init('url');
 secondRaygun.send(...)
 ```
@@ -132,7 +130,7 @@ Only one Raygun object can be attached as the window.onerror handler at one time
 
 #### onBeforeSend
 
-Call `Raygun.onBeforeSend()`, passing in a function which takes one parameter (see the example below). This callback function will be called immediately before the payload is sent. The one parameter it gets will be the payload that is about to be sent. Thus from your function you can inspect the payload and decide whether or not to send it.
+Call `GG.Raygun.onBeforeSend()`, passing in a function which takes one parameter (see the example below). This callback function will be called immediately before the payload is sent. The one parameter it gets will be the payload that is about to be sent. Thus from your function you can inspect the payload and decide whether or not to send it.
 
 From the supplied function, you should return either the payload (intact or mutated as per your needs), or `false`.
 
@@ -148,7 +146,7 @@ var myBeforeSend = function (payload) {
   return payload; // Return false here to abort the send
 }
 
-Raygun.onBeforeSend(myBeforeSend);
+GG.Raygun.onBeforeSend(myBeforeSend);
 ```
 
 ### Sending custom data
@@ -158,13 +156,13 @@ Raygun.onBeforeSend(myBeforeSend);
 Custom data variables (objects, arrays etc) can be added by calling the withCustomData function on the Raygun object:
 
 ```javascript
-Raygun.init('{{your_api_key}}').attach().withCustomData({ foo: 'bar' });
+GG.Raygun.init('{{diagnosticsServiceUrl}}').attach().withCustomData({ foo: 'bar' });
 ```
 
 They can also be passed in as the third parameter in the init() call, for instance:
 
 ```javascript
-Raygun.init('{{your_api_key}}', null, { enviroment: 'production' }).attach();
+GG.Raygun.init('{{diagnosticsServiceUrl}}', null, { enviroment: 'production' }).attach();
 ```
 
 **During a Send:**
@@ -172,7 +170,7 @@ Raygun.init('{{your_api_key}}', null, { enviroment: 'production' }).attach();
 You can also pass custom data with manual send calls, with the second parameter. This lets you add variables that are in scope or global when handled in catch blocks. For example:
 
 ```javascript
-Raygun.send(err, [{customName: 'customData'}];
+GG.Raygun.send(err, [{customName: 'customData'}];
 ```
 
 #### Providing custom data with a callback
@@ -186,10 +184,10 @@ function getMyData() {
  return { num: desiredNum };
 }
 
-Raygun.init('url').attach().withCustomData(getMyData);
+GG.Raygun.init('url').attach().withCustomData(getMyData);
 ```
 
-`getMyData` will be called when Raygun4JS is about to send an error, which will construct the custom data. This will be merged with any custom data provided on a Raygun.send() call.
+`getMyData` will be called when Raygun4JS is about to send an error, which will construct the custom data. This will be merged with any custom data provided on a GG.Raygun.send() call.
 
 ### Adding tags
 
@@ -198,7 +196,7 @@ The Raygun dashboard can also display tags for errors. These are arrays of strin
 **On initialization:**
 
 ```javascript
-Raygun.init('{{url}}').attach().withTags(['tag1', 'tag2']);
+GG.Raygun.init('{{url}}').attach().withTags(['tag1', 'tag2']);
 ```
 
 **During a Send:**
@@ -206,7 +204,7 @@ Raygun.init('{{url}}').attach().withTags(['tag1', 'tag2']);
 Pass tags in as the third parameter:
 
 ```javascript
-Raygun.send(err, null, ['tag']];
+GG.Raygun.send(err, null, ['tag']];
 ```
 
 #### Adding tags with a callback function
@@ -218,17 +216,17 @@ As above for custom data, withTags() can now also accept a callback function. Th
 By default, Raygun4JS assigns a unique anonymous ID for the current user. This is stored as a cookie. If the current user changes, to reset it and assign a new ID you can call:
 
 ```js
-Raygun.resetAnonymousUser();
+GG.Raygun.resetAnonymousUser();
 ```
 
-To disable anonymous user tracking, call `Raygun.init('url', { disableAnonymousUserTracking: true });`.
+To disable anonymous user tracking, call `GG.Raygun.init('url', { disableAnonymousUserTracking: true });`.
 
 #### Rich user data
 
 You can provide additional information about the currently logged in user to Raygun by calling:
 
 ```javascript
-Raygun.setUser('unique_user_identifier');
+GG.Raygun.setUser('unique_user_identifier');
 ```
 
 This method takes additional parameters that are used when reporting over the affected users. the full method signature is
@@ -258,7 +256,7 @@ This will be transmitted with each message. A count of unique users will appear 
 You can set a version and name for your app by calling:
 
 ```
-Raygun.setVersion('1.0.0.0', 'GG.Web.Website');
+GG.Raygun.setVersion('1.0.0.0', 'GG.Web.Website');
 ```
 
 This will allow you to filter the errors in the dashboard by that version. You can also select only the latest version, to ignore errors that were triggered by ancient versions of your code. The parameter needs to be a string in the format x.x.x.x, where x is a positive integer.
@@ -268,17 +266,17 @@ This will allow you to filter the errors in the dashboard by that version. You c
 You can blacklist keys to prevent their values from being sent it the payload by providing an array of key names:
 
 ```javascript
-Raygun.filterSensitiveData(['password', 'credit_card']);
+GG.Raygun.filterSensitiveData(['password', 'credit_card']);
 ```
 
 By default this is applied to the UserCustomData object only (legacy behavior). To apply this to any key-value pair, you can change the filtering scope:
 
 ```javascript
 // Filter any key in the payload
-Raygun.setFilterScope('all');
+GG.Raygun.setFilterScope('all');
 
 // Just filter the custom data (default)
-Raygun.setFilterScope('customData');
+GG.Raygun.setFilterScope('customData');
 ```
 
 You can also pass RegExp objects in the array to `filterSensitiveData`, for fuzzy matching of keys:
@@ -286,7 +284,7 @@ You can also pass RegExp objects in the array to `filterSensitiveData`, for fuzz
 ```javascript
 // Remove any keys that begin with 'credit'
 var creditCardDataRegex = /credit\D*/;
-Raygun.filterSensitiveData([creditCardDataRegex]);
+GG.Raygun.filterSensitiveData([creditCardDataRegex]);
 ```
 
 ### Source maps support
@@ -302,13 +300,13 @@ The provider has a feature where if errors are caught when there is no network a
 Browsers have varying behavior for errors that occur in scripts located on domains that are not the origin. Many of these will be listed in Raygun as 'Script Error', or will contain junk stack traces. You can filter out these errors by settings this:
 
 ```javascript
-Raygun.init('url', { ignore3rdPartyErrors: true });
+GG.Raygun.init('url', { ignore3rdPartyErrors: true });
 ```
 
 There is also an option to whitelist domains which you **do** want to allow transmission of errors to Raygun, which accepts the domains as an array of strings:
 
 ```javascript
-Raygun.init('url', { ignore3rdPartyErrors: true }).whitelistCrossOriginDomains(["jquery.com"]);
+GG.Raygun.init('url', { ignore3rdPartyErrors: true }).whitelistCrossOriginDomains(["jquery.com"]);
 ```
 
 This can be used to allow errors from remote sites and CDNs.
@@ -332,7 +330,7 @@ Other browsers may send on a best-effort basis (version dependent) if some data 
 Offline saving is **disabled by default.** To get or set this option, call the following after your init() call:
 
 ```javascript
-Raygun.saveIfOffline(boolean)
+GG.Raygun.saveIfOffline(boolean)
 ```
 
 If an error is caught and no network connectivity is available (the Raygun API cannot be reached), or if the request times out after 10s, the error will be saved to LocalStorage. This is confirmed to work on Chrome, Firefox, IE10/11, Opera and WinJS.

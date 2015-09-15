@@ -80,5 +80,5 @@ var raygunJsUrlFactory = function (window, Raygun) {
 
 };
 
-raygunJsUrlFactory(window, window.Raygun);
-window.Raygun._seal();
+raygunJsUrlFactory(window, window.GG.Raygun);
+window.GG.Raygun._seal();
