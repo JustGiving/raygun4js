@@ -663,7 +663,7 @@ var raygunFactory = function (window, $, undefined) {
       }
     };
 
-    merge(payload, partialPayload);
+    payload = merge(payload, partialPayload);
 
     if (_filterScope === 'all') {
       payload = filterObject(payload);
