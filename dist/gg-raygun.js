@@ -1,4 +1,4 @@
-/*! Raygun4js - v1.18.4 - 2015-09-18
+/*! Raygun4js - v1.18.4 - 2015-09-22
 * https://github.com/MindscapeHQ/raygun4js
 * Copyright (c) 2015 MindscapeHQ; Licensed MIT */
 (function(window, undefined) {
@@ -1866,7 +1866,7 @@ var raygunFactory = function (window, $, undefined) {
       }
     };
 
-    merge(payload, partialPayload);
+    payload = merge(payload, partialPayload);
 
     if (_filterScope === 'all') {
       payload = filterObject(payload);
