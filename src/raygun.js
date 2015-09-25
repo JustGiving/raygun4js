@@ -525,8 +525,8 @@ var raygunFactory = function (window, $, undefined) {
         var funcName = !frame.func || frame.func === "at " ? "[anonymous]" : frame.func;
         stack += funcName + " @ "
               + "(" + (frame.url || '[anonymous]')
-              + ":" + frame.line.toString()
-              + ":" + frame.column.toString()
+              + ":" + (frame.line || "?").toString()
+              + ":" + (frame.column || "?").toString()
               + ")\n";
       });
     }
