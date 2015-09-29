@@ -1156,7 +1156,7 @@ var raygunFactory = function (window, $, undefined) {
       _disableAnonymousUserTracking = false,
       _wrapAsynchronousCallbacks = false,
       _customData = {},
-      _tags = [],
+      _tags = ["clientside"],
       _user,
       _applicationVersion,
       _applicationName,
@@ -1232,7 +1232,9 @@ var raygunFactory = function (window, $, undefined) {
     },
 
     attach: function () {
-      _traceKit.report.subscribe(processUnhandledException);
+      _traceKit.report.subscribe(function(stacktrace){
+          processUnhandledException(stacktrace, { tags : ["unhandled"]});
+      });
 
       if (_wrapAsynchronousCallbacks) {
         _traceKit.extendToAsynchronousCallbacks();
@@ -1254,6 +1256,7 @@ var raygunFactory = function (window, $, undefined) {
 
     send: function (ex, customData, tags) {
       try {
+          tags = tags || ["handled"];
         processUnhandledException(_traceKit.computeStackTrace(ex), {
           customData: typeof _customData === 'function' ?
             merge(_customData(), customData) :
