@@ -1,4 +1,4 @@
-/*! Raygun4js - v1.18.4 - 2015-09-25
+/*! Raygun4js - v1.18.4 - 2015-09-29
 * https://github.com/MindscapeHQ/raygun4js
 * Copyright (c) 2015 MindscapeHQ; Licensed MIT */
 (function(window, undefined) {
@@ -1687,6 +1687,10 @@ var raygunFactory = function (window, $, undefined) {
     var stack = "",
         qs = {};
 
+    if (options === undefined) {
+      options = {};
+    }
+
     if (_ignore3rdPartyErrors) {
       if (!stackTrace.stack || !stackTrace.stack.length) {
         _private.log('Raygun4JS: Cancelling send due to null stacktrace');
@@ -1732,10 +1736,6 @@ var raygunFactory = function (window, $, undefined) {
               + ":" + (frame.column || "?").toString()
               + ")\n";
       });
-    }
-
-    if (options === undefined) {
-      options = {};
     }
 
     if (isEmpty(options.customData)) {
