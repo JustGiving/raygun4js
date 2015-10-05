@@ -616,11 +616,14 @@ var raygunFactory = function (window, $, undefined) {
     }
 
     if (isEmpty(options.tags)) {
-      if (typeof _tags === 'function') {
-        options.tags = _tags();
-      } else {
-        options.tags = _tags;
-      }
+        if (typeof _tags === 'function') {
+            options.tags = _tags();
+        } else {
+            options.tags = _tags;
+        }
+    }
+    else{
+        mergeArray(options.tags, _tags);
     }
 
     var screen = window.screen || { width: getViewPort().width, height: getViewPort().height, colorDepth: 8 };
