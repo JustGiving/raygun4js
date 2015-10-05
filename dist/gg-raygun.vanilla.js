@@ -1758,7 +1758,7 @@ var raygunFactory = function (window, $, undefined) {
         }
     }
     else{
-        mergeArray(options.tags, _tags);
+        options.tags = mergeArray(options.tags, _tags);
     }
 
     var screen = window.screen || { width: getViewPort().width, height: getViewPort().height, colorDepth: 8 };
