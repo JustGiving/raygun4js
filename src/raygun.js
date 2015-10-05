@@ -698,9 +698,8 @@ var raygunFactory = function (window, $, undefined) {
     xhr = new window.XMLHttpRequest();
     if ("withCredentials" in xhr) {
       // XHR for Chrome/Firefox/Opera/Safari.
-      xhr.withCredentials = true;
       xhr.open(method, url, true);
-
+      xhr.withCredentials = true;
     } else if (window.XDomainRequest) {
       // XDomainRequest for IE.
       if (_allowInsecureSubmissions) {
