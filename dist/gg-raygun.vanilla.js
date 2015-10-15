@@ -1,4 +1,4 @@
-/*! Raygun4js - v1.18.4 - 2015-10-05
+/*! Raygun4js - v1.18.4 - 2015-10-15
 * https://github.com/MindscapeHQ/raygun4js
 * Copyright (c) 2015 MindscapeHQ; Licensed MIT */
 (function(window, undefined) {
@@ -1688,9 +1688,9 @@ var raygunFactory = function (window, $, undefined) {
 
     var partialPayload = {
       'Exception': {
-        'Type': stackTrace.name,
-        'Message': finalMessage,
-        'StackTrace': stack
+        'Type': stackTrace.name || null,
+        'Message': finalMessage || null,
+        'StackTrace': stack || null
       }
     };
 

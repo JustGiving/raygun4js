@@ -553,9 +553,9 @@ var raygunFactory = function (window, $, undefined) {
 
     var partialPayload = {
       'Exception': {
-        'Type': stackTrace.name,
-        'Message': finalMessage,
-        'StackTrace': stack
+        'Type': stackTrace.name || null,
+        'Message': finalMessage || null,
+        'StackTrace': stack || null
       }
     };
 
