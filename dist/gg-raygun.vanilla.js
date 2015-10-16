@@ -1,4 +1,4 @@
-/*! Raygun4js - v1.18.4 - 2015-10-15
+/*! Raygun4js - v1.18.4 - 2015-10-16
 * https://github.com/MindscapeHQ/raygun4js
 * Copyright (c) 2015 MindscapeHQ; Licensed MIT */
 (function(window, undefined) {
@@ -1465,8 +1465,7 @@ var raygunFactory = function (window, $, undefined) {
         ajaxErrorMessage: message,
         contentType: ajaxSettings.contentType,
         requestData: ajaxSettings.data && ajaxSettings.data.slice ? ajaxSettings.data.slice(0, 10240) : undefined,
-        responseData: jqXHR.responseText && jqXHR.responseText.slice ? jqXHR.responseText.slice(0, 10240) : undefined,
-        activeTarget: event.target && event.target.activeElement ? event.target.activeElement.outerHTML : undefined
+        responseData: jqXHR.responseText && jqXHR.responseText.slice ? jqXHR.responseText.slice(0, 10240) : undefined
       });
   }
 
