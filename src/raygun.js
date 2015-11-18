@@ -121,7 +121,7 @@ var raygunFactory = function (window, $, undefined) {
 
     send: function (ex, customData, tags) {
       try {
-          tags = tags || ["handled"];
+          tags = merge(tags || [], ["handled"]);
         processUnhandledException(_traceKit.computeStackTrace(ex), {
           customData: typeof _customData === 'function' ?
             merge(_customData(), customData) :

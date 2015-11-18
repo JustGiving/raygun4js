@@ -1,4 +1,4 @@
-/*! Raygun4js - v1.18.4 - 2015-10-16
+/*! Raygun4js - v1.18.4 - 2015-11-18
 * https://github.com/MindscapeHQ/raygun4js
 * Copyright (c) 2015 MindscapeHQ; Licensed MIT */
 (function(window, undefined) {
@@ -1256,7 +1256,7 @@ var raygunFactory = function (window, $, undefined) {
 
     send: function (ex, customData, tags) {
       try {
-          tags = tags || ["handled"];
+          tags = merge(tags || [], ["handled"]);
         processUnhandledException(_traceKit.computeStackTrace(ex), {
           customData: typeof _customData === 'function' ?
             merge(_customData(), customData) :
