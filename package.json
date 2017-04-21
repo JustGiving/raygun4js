@@ -1,19 +1,22 @@
 {
-  "name": "raygun4js",
+  "name": "@jg/raygun4js",
+  "publishConfig": {
+    "registry": "http://nuget.prod.justgiving.service/artifactory/api/npm/int-npm"
+  },
   "main": "dist/raygun.js",
   "title": "Raygun4js",
-  "description": "Raygun.io plugin for JavaScript",
-  "version": "1.18.4",
-  "homepage": "https://github.com/MindscapeHQ/raygun4js",
+  "description": "JG forked Raygun.io plugin for JavaScript",
+  "version": "1.18.5",
+  "homepage": "https://github.com/JustGiving/raygun4js",
   "author": {
     "name": "MindscapeHQ",
     "email": "hello@raygun.io"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/MindscapeHQ/raygun4js.git"
+    "url": "https://github.com/JustGiving/raygun4js"
   },
-  "bugs": "https://github.com/MindscapeHQ/raygun4js/issues",
+  "bugs": "https://github.com/JustGiving/raygun4js/issues",
   "licenses": [
     {
       "type": "MIT",
